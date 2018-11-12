@@ -54,6 +54,12 @@ public class GamePiece : MonoBehaviour {
 		get { return colorComponent; }
 	}
 
+    private SelectablePiece selectableComponent;
+
+    public SelectablePiece SelectableComponent {
+        get { return selectableComponent;  }
+    }
+
 	void Awake()
 	{
 		movableComponent = GetComponent<MovablePiece> ();

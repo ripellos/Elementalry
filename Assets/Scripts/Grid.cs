@@ -29,10 +29,15 @@ public class Grid : MonoBehaviour {
 	private Dictionary<PieceType, GameObject> piecePrefabDict;
 
 	private GamePiece[,] pieces;
+    private Stack<GamePiece> selectedPieces;
 
-	// Use this for initialization
-	void Start () {
+    private ColorPiece.ColorType selectedColor;
+    private bool selecting = false;
+
+    // Use this for initialization
+    void Start () {
 		piecePrefabDict = new Dictionary<PieceType, GameObject> ();
+        selectedPieces = new Stack<GamePiece>();
 
 		for (int i = 0; i < piecePrefabs.Length; i++) {
 			if (!piecePrefabDict.ContainsKey (piecePrefabs [i].type)) {
@@ -132,4 +137,65 @@ public class Grid : MonoBehaviour {
 
 		return pieces [x, y];
 	}
+
+    public void StartingDragging(GamePiece piece) {
+        if (!selecting) {
+
+            selectedPieces = new Stack<GamePiece>();
+            selecting = true;
+            selectedColor = piece.ColorComponent.Color;
+            SelectPiece(piece);
+        }
+    }
+    public bool EnteredPiece(GamePiece piece) {
+        if (selectedPieces.Contains(piece)) {
+            return false;
+        }
+        if (!selecting) {
+            return false;
+        }
+        if (piece.ColorComponent.Color != selectedColor) {
+            return false;
+        }
+        if (!IsAdjacent(piece, selectedPieces.Peek())) {
+            return false;
+        }
+        SelectPiece(piece);
+
+        return true;
+    }
+    public void StopDragging(GamePiece piece) {
+        //Debug.Log("You found " + selectedPieces.Count + " " + selectedColor + " pieces.");
+        foreach (GamePiece seenPiece in selectedPieces) {
+             seenPiece.SelectableComponent.Selected = false;
+        }
+
+        if (selectedPieces.Peek().Equals(piece)) {
+            // Clear the pieces from the board
+        }
+
+        // Regardless of whether or not the dragging stops on the last piece in
+        // the series, we clear the selected pieces. This prevents erroneously
+        // clearing the selected pieces if accidentally released on an
+        // incompatible piece.
+
+        // It's not clear if we can safely clear the stack if the GameObjects
+        // are destroyed (which occurs when they are cleared from the grid.
+        selectedPieces.Clear();
+        selecting = false;
+    }
+
+    bool IsAdjacent(GamePiece piece1, GamePiece piece2) {
+        return ((int)Mathf.Abs(piece1.X - piece2.X) <= 1
+                && (int)Mathf.Abs(piece1.Y - piece2.Y) <= 1);
+
+    }
+    void SelectPiece(GamePiece piece) {
+        piece.SelectableComponent.Selected = true;
+        selectedPieces.Push(piece);
+    }
+    void DeselectLastPiece() {
+        GamePiece piece = selectedPieces.Pop();
+        piece.SelectableComponent.Selected = false;
+    }
 }
