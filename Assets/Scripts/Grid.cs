@@ -140,7 +140,6 @@ public class Grid : MonoBehaviour {
 
     public void StartingDragging(GamePiece piece) {
         if (!selecting) {
-
             selectedPieces = new Stack<GamePiece>();
             selecting = true;
             selectedColor = piece.ColorComponent.Color;
@@ -148,15 +147,15 @@ public class Grid : MonoBehaviour {
         }
     }
     public bool EnteredPiece(GamePiece piece) {
-        if (selectedPieces.Contains(piece)) {
-            return false;
-        }
         if (!selecting) {
             return false;
         }
         if (piece.ColorComponent.Color != selectedColor) {
             return false;
         }
+        if (selectedPieces.Contains(piece)) {
+            return false;
+        }       
         if (!IsAdjacent(piece, selectedPieces.Peek())) {
             return false;
         }
@@ -164,14 +163,11 @@ public class Grid : MonoBehaviour {
 
         return true;
     }
-    public void StopDragging(GamePiece piece) {
-        //Debug.Log("You found " + selectedPieces.Count + " " + selectedColor + " pieces.");
-        foreach (GamePiece seenPiece in selectedPieces) {
-             seenPiece.SelectableComponent.Selected = false;
-        }
-
-        if (selectedPieces.Peek().Equals(piece)) {
-            // Clear the pieces from the board
+    public void StopDragging() {
+        while (selectedPieces.Count > 0)
+        {
+            GamePiece seenPiece = selectedPieces.Pop();
+            seenPiece.SelectableComponent.Selected = false;
         }
 
         // Regardless of whether or not the dragging stops on the last piece in
@@ -181,7 +177,7 @@ public class Grid : MonoBehaviour {
 
         // It's not clear if we can safely clear the stack if the GameObjects
         // are destroyed (which occurs when they are cleared from the grid.
-        selectedPieces.Clear();
+       //selectedPieces.Clear();
         selecting = false;
     }
 

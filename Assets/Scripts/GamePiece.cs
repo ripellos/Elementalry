@@ -64,6 +64,7 @@ public class GamePiece : MonoBehaviour {
 	{
 		movableComponent = GetComponent<MovablePiece> ();
 		colorComponent = GetComponent<ColorPiece> ();
+        selectableComponent = GetComponent<SelectablePiece>();
 	}
 
 	// Use this for initialization
@@ -93,4 +94,25 @@ public class GamePiece : MonoBehaviour {
 	{
 		return colorComponent != null;
 	}
+
+    public bool IsSelectable() {
+        return selectableComponent != null;
+    }
+
+    private void OnMouseDown() {
+        if (IsSelectable()) {
+            grid.StartingDragging(this);
+        }
+    }
+    private void OnMouseEnter() {
+        if (IsSelectable()) {
+            grid.EnteredPiece(this);
+        }
+    }
+    private void OnMouseUp() {
+
+        if (IsSelectable()) {
+            grid.StopDragging();
+        }
+    }
 }

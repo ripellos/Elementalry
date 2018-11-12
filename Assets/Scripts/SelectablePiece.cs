@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SelectablePiece : MonoBehaviour {
 
-    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
     private bool selected = false;
 
@@ -12,14 +12,13 @@ public class SelectablePiece : MonoBehaviour {
         get { return selected; }
         set {
             selected = value;
-            animator.SetBool("selected", value);
+            Color color = spriteRenderer.color;
+            color.r = value ? 0f : 1f;
+            spriteRenderer.color = color;
         }
     }
 
-    GamePiece piece;
-
     private void Awake() {
-        piece = GetComponent<GamePiece>();
-        animator = GetComponent<Animator>();
+        spriteRenderer = transform.Find("piece").GetComponent<SpriteRenderer>();
     }
 }
