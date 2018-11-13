@@ -67,11 +67,17 @@ public class Grid : MonoBehaviour {
 	
 	}
 
-	public IEnumerator Fill()
-	{
-		while (FillStep ()) {
-			yield return new WaitForSeconds (fillTime);
-		}
+    public IEnumerator Fill() {
+        bool needsRefill = true;
+        while (needsRefill) {
+            while (FillStep()) {
+                yield return new WaitForSeconds(fillTime);
+            }
+            // Right now there will never be more matches. We only ever clear
+            // what the player selects which will always be nothing after fill.
+
+            needsRefill = ClearAllValidMatches();
+        }
 	}
 
 	public bool FillStep()
@@ -138,6 +144,27 @@ public class Grid : MonoBehaviour {
 		return pieces [x, y];
 	}
 
+    public bool ClearAllValidMatches() {
+        bool needsRefill = false;
+        while(selectedPieces.Count > 0) {
+            GamePiece piece = selectedPieces.Pop();
+            if (ClearPiece(piece.X, piece.Y)){
+                needsRefill = true;
+            }
+        }
+        Debug.Log("needsRefill: " + needsRefill);
+        return needsRefill;
+    }
+
+    bool ClearPiece(int x, int y){
+        if(pieces[x,y].IsClearable() && !pieces[x,y].ClearableComponent.IsBeingCleared) {
+            pieces[x, y].ClearableComponent.Clear();
+            SpawnNewPiece(x, y, PieceType.EMPTY);
+            return true;
+        }
+        return false;
+    }
+
     public void StartingDragging(GamePiece piece) {
         if (!selecting) {
             selectedPieces = new Stack<GamePiece>();
@@ -164,11 +191,14 @@ public class Grid : MonoBehaviour {
         return true;
     }
     public void StopDragging() {
-        while (selectedPieces.Count > 0)
+        ClearAllValidMatches();
+        StartCoroutine(Fill());
+       
+        /*while (selectedPieces.Count > 0)
         {
             GamePiece seenPiece = selectedPieces.Pop();
             seenPiece.SelectableComponent.Selected = false;
-        }
+        }*/
 
         // Regardless of whether or not the dragging stops on the last piece in
         // the series, we clear the selected pieces. This prevents erroneously
