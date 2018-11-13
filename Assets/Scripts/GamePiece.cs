@@ -60,11 +60,18 @@ public class GamePiece : MonoBehaviour {
         get { return selectableComponent;  }
     }
 
+    private ClearablePiece clearableComponent;
+
+    public ClearablePiece ClearableComponent {
+        get { return clearableComponent;  }
+    }
+
 	void Awake()
 	{
 		movableComponent = GetComponent<MovablePiece> ();
 		colorComponent = GetComponent<ColorPiece> ();
         selectableComponent = GetComponent<SelectablePiece>();
+        clearableComponent = GetComponent<ClearablePiece>();
 	}
 
 	// Use this for initialization
@@ -97,6 +104,10 @@ public class GamePiece : MonoBehaviour {
 
     public bool IsSelectable() {
         return selectableComponent != null;
+    }
+
+    public bool IsClearable() {
+        return clearableComponent != null;
     }
 
     private void OnMouseDown() {
