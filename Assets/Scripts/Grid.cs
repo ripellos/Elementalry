@@ -191,8 +191,15 @@ public class Grid : MonoBehaviour {
         return true;
     }
     public void StopDragging() {
-        ClearAllValidMatches();
-        StartCoroutine(Fill());
+        selecting = false;
+        if (selectedPieces.Count >= 3) {
+            ClearAllValidMatches();
+            StartCoroutine(Fill());
+        } else {
+            foreach (GamePiece piece in selectedPieces) {
+                piece.SelectableComponent.Selected = false;
+            }
+        }
        
         /*while (selectedPieces.Count > 0)
         {
