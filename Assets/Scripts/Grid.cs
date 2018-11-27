@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-// Touch
+
 public class Grid : MonoBehaviour {
 
 	public enum PieceType
