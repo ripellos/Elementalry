@@ -206,8 +206,8 @@ public class Grid : MonoBehaviour {
     public void StopDragging() {
         selecting = false;
         if (selectedPieces.Count >= 3) {
-            level.OnMove();
             ClearAllValidMatches();
+            level.OnMove();
             StartCoroutine(Fill());
         }
         else {

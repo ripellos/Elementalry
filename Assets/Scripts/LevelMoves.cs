@@ -20,8 +20,10 @@ public class LevelMoves : Level {
     }
     public override void OnMove() {
         movesUsed++;
+        Debug.Log("Moves used: " + movesUsed);
+        Debug.Log("Moves left: " + (numberOfMoves - movesUsed));
 
-        if (movesUsed >= numberOfMoves) {
+        if (numberOfMoves - movesUsed == 0) {
             if (currentScore < targetScore) {
                 GameLose();
             }
@@ -30,6 +32,4 @@ public class LevelMoves : Level {
             }
         }
     }
-
-
 }

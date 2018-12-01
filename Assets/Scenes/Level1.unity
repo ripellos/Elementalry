@@ -137,13 +137,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 30626182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca7a3f4e5ffd84fe8a497f873cc682dd, type: 3}
+  m_Script: {fileID: 11500000, guid: a9362d28b66977348960aa225c865b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gridRef: {fileID: 581336197}
-  score1Star: 0
-  score2Star: 0
-  score3Star: 0
+  score1Star: 8000
+  score2Star: 9000
+  score3Star: 10000
+  numberOfMoves: 10
+  targetScore: 8000
 --- !u!4 &30626184
 Transform:
   m_ObjectHideFlags: 0
