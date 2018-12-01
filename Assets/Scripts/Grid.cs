@@ -19,12 +19,23 @@ public class Grid : MonoBehaviour {
 		public GameObject prefab;
 	};
 
+    [System.Serializable]
+    public struct PiecePosition
+    {
+        public PieceType type;
+        public int x;
+        public int y;
+    }
+
 	public int xDim;
 	public int yDim;
 	public float fillTime;
 
 	public PiecePrefab[] piecePrefabs;
 	public GameObject backgroundPrefab;
+    public PiecePosition[] initialPieces;
+
+    public Level level;
 
 	private Dictionary<PieceType, GameObject> piecePrefabDict;
 
@@ -33,9 +44,10 @@ public class Grid : MonoBehaviour {
 
     private ColorPiece.ColorType selectedColor;
     private bool selecting = false;
+    private bool gameOver = false;
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
 		piecePrefabDict = new Dictionary<PieceType, GameObject> ();
         selectedPieces = new Stack<GamePiece>();
 
@@ -52,10 +64,19 @@ public class Grid : MonoBehaviour {
 			}
 		}
 
-		pieces = new GamePiece[xDim, yDim];
+        pieces = new GamePiece[xDim, yDim];
+
+        foreach (PiecePosition piece in initialPieces) {
+            if(piece.x >= 0 && piece.x < xDim && piece.y >= 0 && piece.y < yDim) {
+                SpawnNewPiece(piece.x, piece.y, piece.type);
+            }
+        }
+
 		for (int x = 0; x < xDim; x++) {
 			for (int y = 0; y < yDim; y++) {
-				SpawnNewPiece (x, y, PieceType.EMPTY);
+                if (pieces[x, y] == null) {
+                    SpawnNewPiece(x, y, PieceType.EMPTY);
+                }
 			}
 		}
 
@@ -152,7 +173,6 @@ public class Grid : MonoBehaviour {
                 needsRefill = true;
             }
         }
-        Debug.Log("needsRefill: " + needsRefill);
         return needsRefill;
     }
 
@@ -165,7 +185,14 @@ public class Grid : MonoBehaviour {
         return false;
     }
 
+    public void GameOver()
+    {
+        gameOver = true;
+    }
+
     public void StartingDragging(GamePiece piece) {
+        if(gameOver)
+        { return; }
         if (!selecting) {
             selectedPieces = new Stack<GamePiece>();
             selecting = true;
@@ -193,6 +220,7 @@ public class Grid : MonoBehaviour {
     public void StopDragging() {
         selecting = false;
         if (selectedPieces.Count >= 3) {
+            level.OnMove();
             ClearAllValidMatches();
             StartCoroutine(Fill());
         } else {

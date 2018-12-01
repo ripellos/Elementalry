@@ -35,14 +35,15 @@ public class Level : MonoBehaviour {
 	}
 
     public virtual void GameWin() {
+        gridRef.GameOver();
         Debug.Log("You win!");
     }
 
     public virtual void GameLose() {
+        gridRef.GameOver();
         Debug.Log("You lose!");
     }
-    public virtual void OnMove() {
-
+    public virtual void OnMove() {   
     }
     public virtual void OnPieceCleared(GamePiece piece) {
         // Determine score from piece.

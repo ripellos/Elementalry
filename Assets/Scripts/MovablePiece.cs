@@ -43,6 +43,6 @@ public class MovablePiece : MonoBehaviour {
 			yield return 0;
 		}
 
-		piece.transform.position = piece.GridRef.GetWorldPosition (newX, newY);
+		piece.transform.localPosition = piece.GridRef.GetWorldPosition (newX, newY);
 	}
 }
