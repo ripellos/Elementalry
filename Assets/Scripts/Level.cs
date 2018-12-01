@@ -24,15 +24,15 @@ public class Level : MonoBehaviour {
         get { return type; }
     }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Use this for initialization
+    void Start() {
+
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
 
     public virtual void GameWin() {
         gridRef.GameOver();
@@ -43,7 +43,7 @@ public class Level : MonoBehaviour {
         gridRef.GameOver();
         Debug.Log("You lose!");
     }
-    public virtual void OnMove() {   
+    public virtual void OnMove() {
     }
     public virtual void OnPieceCleared(GamePiece piece) {
         // Determine score from piece.

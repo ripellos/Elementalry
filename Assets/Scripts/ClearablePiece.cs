@@ -16,20 +16,20 @@ public class ClearablePiece : MonoBehaviour {
         piece = GetComponent<GamePiece>();
     }
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    void Start() {
+
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
 
     public void Clear() {
         piece.GridRef.level.OnPieceCleared(piece);
         isBeingCleared = true;
         StartCoroutine(ClearCoroutine());
-  
+
     }
 
     IEnumerator ClearCoroutine() {

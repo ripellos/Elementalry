@@ -4,42 +4,39 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour {
 
-	public enum PieceType
-	{
-		EMPTY,
-		NORMAL,
-		BUBBLE,
-		COUNT,
-	};
-
-	[System.Serializable]
-	public struct PiecePrefab
-	{
-		public PieceType type;
-		public GameObject prefab;
-	};
+    public enum PieceType {
+        EMPTY,
+        NORMAL,
+        BUBBLE,
+        COUNT,
+    };
 
     [System.Serializable]
-    public struct PiecePosition
-    {
+    public struct PiecePrefab {
+        public PieceType type;
+        public GameObject prefab;
+    };
+
+    [System.Serializable]
+    public struct PiecePosition {
         public PieceType type;
         public int x;
         public int y;
     }
 
-	public int xDim;
-	public int yDim;
-	public float fillTime;
+    public int xDim;
+    public int yDim;
+    public float fillTime;
 
-	public PiecePrefab[] piecePrefabs;
-	public GameObject backgroundPrefab;
+    public PiecePrefab[] piecePrefabs;
+    public GameObject backgroundPrefab;
     public PiecePosition[] initialPieces;
 
     public Level level;
 
-	private Dictionary<PieceType, GameObject> piecePrefabDict;
+    private Dictionary<PieceType, GameObject> piecePrefabDict;
 
-	private GamePiece[,] pieces;
+    private GamePiece[,] pieces;
     private Stack<GamePiece> selectedPieces;
 
     private ColorPiece.ColorType selectedColor;
@@ -47,46 +44,46 @@ public class Grid : MonoBehaviour {
     private bool gameOver = false;
 
     // Use this for initialization
-    void Awake () {
-		piecePrefabDict = new Dictionary<PieceType, GameObject> ();
+    void Awake() {
+        piecePrefabDict = new Dictionary<PieceType, GameObject>();
         selectedPieces = new Stack<GamePiece>();
 
-		for (int i = 0; i < piecePrefabs.Length; i++) {
-			if (!piecePrefabDict.ContainsKey (piecePrefabs [i].type)) {
-				piecePrefabDict.Add (piecePrefabs [i].type, piecePrefabs [i].prefab);
-			}
-		}
+        for (int i = 0; i < piecePrefabs.Length; i++) {
+            if (!piecePrefabDict.ContainsKey(piecePrefabs[i].type)) {
+                piecePrefabDict.Add(piecePrefabs[i].type, piecePrefabs[i].prefab);
+            }
+        }
 
-		for (int x = 0; x < xDim; x++) {
-			for (int y = 0; y < yDim; y++) {
-				GameObject background = (GameObject)Instantiate (backgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
-				background.transform.parent = transform;
-			}
-		}
+        for (int x = 0; x < xDim; x++) {
+            for (int y = 0; y < yDim; y++) {
+                GameObject background = (GameObject)Instantiate(backgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
+                background.transform.parent = transform;
+            }
+        }
 
         pieces = new GamePiece[xDim, yDim];
 
         foreach (PiecePosition piece in initialPieces) {
-            if(piece.x >= 0 && piece.x < xDim && piece.y >= 0 && piece.y < yDim) {
+            if (piece.x >= 0 && piece.x < xDim && piece.y >= 0 && piece.y < yDim) {
                 SpawnNewPiece(piece.x, piece.y, piece.type);
             }
         }
 
-		for (int x = 0; x < xDim; x++) {
-			for (int y = 0; y < yDim; y++) {
+        for (int x = 0; x < xDim; x++) {
+            for (int y = 0; y < yDim; y++) {
                 if (pieces[x, y] == null) {
                     SpawnNewPiece(x, y, PieceType.EMPTY);
                 }
-			}
-		}
+            }
+        }
 
-		StartCoroutine(Fill ());
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        StartCoroutine(Fill());
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
 
     public IEnumerator Fill() {
         bool needsRefill = true;
@@ -99,85 +96,76 @@ public class Grid : MonoBehaviour {
 
             needsRefill = ClearAllValidMatches();
         }
-	}
+    }
 
-	public bool FillStep()
-	{
-		bool movedPiece = false;
+    public bool FillStep() {
+        bool movedPiece = false;
 
-		for (int y = yDim-2; y >= 0; y--)
-		{
-			for (int x = 0; x < xDim; x++)
-			{
-				GamePiece piece = pieces [x, y];
+        for (int y = yDim - 2; y >= 0; y--) {
+            for (int x = 0; x < xDim; x++) {
+                GamePiece piece = pieces[x, y];
 
-				if (piece.IsMovable ())
-				{
-					GamePiece pieceBelow = pieces [x, y + 1];
+                if (piece.IsMovable()) {
+                    GamePiece pieceBelow = pieces[x, y + 1];
 
-					if (pieceBelow.Type == PieceType.EMPTY)
-					{
-						Destroy (pieceBelow.gameObject);
-						piece.MovableComponent.Move (x, y + 1, fillTime);
-						pieces [x, y + 1] = piece;
-						SpawnNewPiece (x, y, PieceType.EMPTY);
-						movedPiece = true;
-					}
-				}
-			}
-		}
+                    if (pieceBelow.Type == PieceType.EMPTY) {
+                        Destroy(pieceBelow.gameObject);
+                        piece.MovableComponent.Move(x, y + 1, fillTime);
+                        pieces[x, y + 1] = piece;
+                        SpawnNewPiece(x, y, PieceType.EMPTY);
+                        movedPiece = true;
+                    }
+                }
+            }
+        }
 
-		for (int x = 0; x < xDim; x++)
-		{
-			GamePiece pieceBelow = pieces [x, 0];
+        for (int x = 0; x < xDim; x++) {
+            GamePiece pieceBelow = pieces[x, 0];
 
-			if (pieceBelow.Type == PieceType.EMPTY)
-			{
-				Destroy (pieceBelow.gameObject);
-				GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
-				newPiece.transform.parent = transform;
+            if (pieceBelow.Type == PieceType.EMPTY) {
+                Destroy(pieceBelow.gameObject);
+                GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
+                newPiece.transform.parent = transform;
 
-				pieces [x, 0] = newPiece.GetComponent<GamePiece> ();
-				pieces [x, 0].Init (x, -1, this, PieceType.NORMAL);
-				pieces [x, 0].MovableComponent.Move (x, 0, fillTime);
-				pieces [x, 0].ColorComponent.SetColor ((ColorPiece.ColorType)Random.Range (0, pieces [x, 0].ColorComponent.NumColors));
-				movedPiece = true;
-			}
-		}
+                pieces[x, 0] = newPiece.GetComponent<GamePiece>();
+                pieces[x, 0].Init(x, -1, this, PieceType.NORMAL);
+                pieces[x, 0].MovableComponent.Move(x, 0, fillTime);
+                pieces[x, 0].ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, pieces[x, 0].ColorComponent.NumColors));
+                movedPiece = true;
+            }
+        }
 
-		return movedPiece;
-	}
+        return movedPiece;
+    }
 
-	public Vector2 GetWorldPosition(int x, int y)
-	{
-		return new Vector2 (transform.position.x - xDim / 2.0f + x,
-			transform.position.y + yDim / 2.0f - y);
-	}
+    public Vector2 GetWorldPosition(int x, int y) {
+        return new Vector2(transform.position.x - xDim / 2.0f + x,
+            transform.position.y + yDim / 2.0f - y);
+    }
 
-	public GamePiece SpawnNewPiece(int x, int y, PieceType type)
-	{
-		GameObject newPiece = (GameObject)Instantiate (piecePrefabDict [type], GetWorldPosition (x, y), Quaternion.identity);
-		newPiece.transform.parent = transform;
+    public GamePiece SpawnNewPiece(int x, int y, PieceType type) {
+        GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[type], GetWorldPosition(x, y), Quaternion.identity);
+        newPiece.transform.parent = transform;
 
-		pieces [x, y] = newPiece.GetComponent<GamePiece> ();
-		pieces [x, y].Init (x, y, this, type);
+        pieces[x, y] = newPiece.GetComponent<GamePiece>();
+        pieces[x, y].Init(x, y, this, type);
 
-		return pieces [x, y];
-	}
+        return pieces[x, y];
+    }
 
     public bool ClearAllValidMatches() {
         bool needsRefill = false;
-        while(selectedPieces.Count > 0) {
+        while (selectedPieces.Count > 0) {
             GamePiece piece = selectedPieces.Pop();
-            if (ClearPiece(piece.X, piece.Y)){
+            if (ClearPiece(piece.X, piece.Y)) {
                 needsRefill = true;
             }
         }
         return needsRefill;
     }
 
-    bool ClearPiece(int x, int y){
-        if(pieces[x,y].IsClearable() && !pieces[x,y].ClearableComponent.IsBeingCleared) {
+    bool ClearPiece(int x, int y) {
+        if (pieces[x, y].IsClearable() && !pieces[x, y].ClearableComponent.IsBeingCleared) {
             pieces[x, y].ClearableComponent.Clear();
             SpawnNewPiece(x, y, PieceType.EMPTY);
             return true;
@@ -185,14 +173,12 @@ public class Grid : MonoBehaviour {
         return false;
     }
 
-    public void GameOver()
-    {
+    public void GameOver() {
         gameOver = true;
     }
 
     public void StartingDragging(GamePiece piece) {
-        if(gameOver)
-        { return; }
+        if (gameOver) { return; }
         if (!selecting) {
             selectedPieces = new Stack<GamePiece>();
             selecting = true;
@@ -209,7 +195,7 @@ public class Grid : MonoBehaviour {
         }
         if (selectedPieces.Contains(piece)) {
             return false;
-        }       
+        }
         if (!IsAdjacent(piece, selectedPieces.Peek())) {
             return false;
         }
@@ -223,12 +209,13 @@ public class Grid : MonoBehaviour {
             level.OnMove();
             ClearAllValidMatches();
             StartCoroutine(Fill());
-        } else {
+        }
+        else {
             foreach (GamePiece piece in selectedPieces) {
                 piece.SelectableComponent.Selected = false;
             }
         }
-       
+
         /*while (selectedPieces.Count > 0)
         {
             GamePiece seenPiece = selectedPieces.Pop();
@@ -242,7 +229,7 @@ public class Grid : MonoBehaviour {
 
         // It's not clear if we can safely clear the stack if the GameObjects
         // are destroyed (which occurs when they are cleared from the grid.
-       //selectedPieces.Clear();
+        //selectedPieces.Clear();
         selecting = false;
     }
 
