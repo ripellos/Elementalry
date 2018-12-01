@@ -9,28 +9,27 @@ public class LevelMoves : Level {
 
     private int movesUsed = 0;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-    public override void OnMove()
-    {
+    // Use this for initialization
+    void Start() {
+
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
+    public override void OnMove() {
         movesUsed++;
 
-        if(movesUsed >= numberOfMoves)
-        {
-            if (currentScore < targetScore)
-            {
+        if (movesUsed >= numberOfMoves) {
+            if (currentScore < targetScore) {
                 GameLose();
             }
-            else { GameWin(); }
+            else {
+                GameWin();
+            }
         }
     }
-    
+
 
 }
